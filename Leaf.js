@@ -3,7 +3,7 @@
 
   class Leaf {
 
-    constructor(parentBranch, angle) {
+    constructor(parentBranch, tree, angle) {
       this.age = 0;
 
       this.angle = angle;
@@ -12,6 +12,11 @@
       this.width = 1;
 
       this.parentBranch = parentBranch;
+      this.tree = tree;
+    }
+
+    isDead() {
+      return this.age > 10;
     }
 
     endX() {
@@ -42,6 +47,7 @@
     }
 
     grow() {
+      this.tree.feed();
       this.age += 1;
     }
   }

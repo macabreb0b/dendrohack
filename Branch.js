@@ -2,23 +2,29 @@
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Leaf = DendroHack.Leaf;
 
+  const NEW_BRANCH_WIDTH = 2;
+  const NEW_BRANCH_LENGTH = 8;
+  const NEW_LEAF_SIZE = 1;
+
   const MAX_JANK_ANGLE = 1.5708
   function getNewAngle(angle) {
     return angle + MAX_JANK_ANGLE * Math.random() * (Math.random() < 0.5 ? -1 : 1)
   }
 
   class Branch {
-    constructor(parentBranch, angle, startX, startY) {
+    constructor(parentBranch, tree, angle, startX, startY) {
+      this.parentBranch = parentBranch;
+      this.tree = tree;
+
       this.angle = angle;
       this._startX = startX
       this._startY = startY
 
-      this.length = 8;
-      this.width = 2; // this also represents "capacity"
+      this.length = NEW_BRANCH_LENGTH;
+      this.width = NEW_BRANCH_WIDTH; // this also represents "capacity"
 
-      this.leaves = [new Leaf(this, getNewAngle(this.angle))];
+      this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle))];
       this.branches = [];
-      this.parentBranch = parentBranch;
     }
 
     endX() {
@@ -38,7 +44,8 @@
     }
 
     draw(ctx) {
-      ctx.strokeStyle = '#f00';
+      /** use width to compute rgb value; higher width => lower number (darker shade) */
+      ctx.strokeStyle = 'rgb(' + (10 + (245 * 2 / this.width)) + ',0,0)';
       ctx.lineWidth = this.width;
 
       ctx.beginPath();
@@ -58,17 +65,21 @@
       this.prune();
 
       if (this.canGrowNewBranch()) {
-        this.branches.push(new Branch(this, getNewAngle(this.angle)))
+        this.branches.unshift(new Branch(this, this.tree, getNewAngle(this.angle)))
+        this.tree.drain(this.growBranchCost())
       } else if (this.canGrowNewLeaf()) {
-        this.leaves.push(new Leaf(this, getNewAngle(this.angle)))
-      } else if (this.canGrowSelf()) {
+        this.leaves.push(new Leaf(this, this.tree, getNewAngle(this.angle)))
+        this.tree.drain(this.growLeafCost())
+      } else if (this.canGrowSize()) {
+        this.tree.drain(this.growSizeCost());
+
         this.width += 1; /** TODO randomize this number to get more branches sometimes? */
         this.length += 1;
       }
     }
 
     prune() {
-      this.leaves = this.leaves.filter(leaf => leaf.age < 5);
+      this.leaves = this.leaves.filter(leaf => !leaf.isDead());
     }
 
     capacity() {
@@ -83,17 +94,37 @@
     }
 
     canGrowNewBranch() {
-      return this.capacity() >= 2 && this.branches.length < 2;
+      return (
+        this.capacity() >= NEW_BRANCH_WIDTH &&
+        this.branches.length < 2 &&
+        this.tree.energy > this.growBranchCost()
+      );
+    }
+
+    growBranchCost() {
+      return NEW_BRANCH_WIDTH * NEW_BRANCH_LENGTH;
     }
 
     canGrowNewLeaf() {
-      return this.capacity() >= 1 && this.leaves.length == 0;
+      return (
+        this.capacity() >= NEW_LEAF_SIZE &&
+        this.leaves.length == 0 &&
+        this.tree.energy > this.growLeafCost()
+      );
     }
 
-    canGrowSelf() {
-      if(!this.parentBranch) return true;
+    growLeafCost() {
+      return 1;
+    }
 
-      return this.parentBranch.capacity() > 0;
+    canGrowSize() {
+      return this.tree.energy > this.growSizeCost() && (this.parentBranch ? this.parentBranch.capacity() > 0 : true);
+    }
+
+    growSizeCost() {
+      const currentArea = this.width * this.length;
+      const potentialArea = (this.width + 1) * (this.length + 1);
+      return potentialArea - currentArea;
     }
   }
 

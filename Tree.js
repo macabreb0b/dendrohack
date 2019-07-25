@@ -3,15 +3,18 @@
   const Branch = DendroHack.Branch;
 
   class Tree {
-    // this.intervalId = DendroHack.intervalId// ??
+
 
     constructor(width, height) {
       const startX = width / 2;
       const startY = height * 3 / 4;
 
+      this.energy = 3;
+
       this.startBranch = new Branch(
         null /** no parent branch for the first branch */,
-        4.71239,
+        this, /** reference to Tree */
+        4.71239, /** 270 degrees in radians (point straight up to start) */
         startX, /** only root branch gets startX / startY */
         startY, /** only root branch gets startX / startY */
       )
@@ -23,8 +26,19 @@
 
     grow() {
       this.startBranch.grow();
+      console.log(this.energy);
+    }
+
+    feed() {
+      this.energy += 1;
+    }
+
+    drain(amount) {
+      this.energy -= amount;
     }
   }
+
+
 
   DendroHack.Tree = Tree;
 
