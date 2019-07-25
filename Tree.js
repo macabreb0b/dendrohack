@@ -7,7 +7,7 @@
 
     constructor(width, height) {
       const startX = width / 2;
-      const startY = height / 2;
+      const startY = height * 3 / 4;
 
       this.startBranch = new Branch(
         null /** no parent branch for the first branch */,

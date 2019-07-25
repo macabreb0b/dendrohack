@@ -4,10 +4,11 @@
   class Leaf {
 
     constructor(parentBranch, angle) {
-      console.log('new Leaf')
+      this.age = 0;
+
       this.angle = angle;
 
-      this.length = 10;
+      this.length = 5;
       this.width = 1;
 
       this.parentBranch = parentBranch;
@@ -40,6 +41,9 @@
       ctx.stroke();
     }
 
+    grow() {
+      this.age += 1;
+    }
   }
 
   DendroHack.Leaf = Leaf;

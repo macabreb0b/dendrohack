@@ -27,10 +27,9 @@
       this.environment = new Environment(this.xDim, this.yDim);
       this.tree = new Tree(this.xDim, this.yDim);
 
-
       this.intervalId = setInterval(function() {
         sim.step(ctx);
-      }, 1000);
+      }, 100);
     }
 
     stop() {

@@ -25,7 +25,6 @@
 
         let app;
         const restart = () => {
-            console.log('start');
             if (app) app.stop();
             app = new DendroHack.App(width, height, canvas);
             app.start()

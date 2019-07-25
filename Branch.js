@@ -2,21 +2,18 @@
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Leaf = DendroHack.Leaf;
 
-  const MAX_JANK_ANGLE = 1
+  const MAX_JANK_ANGLE = 1.5708
   function getNewAngle(angle) {
     return angle + MAX_JANK_ANGLE * Math.random() * (Math.random() < 0.5 ? -1 : 1)
   }
 
   class Branch {
     constructor(parentBranch, angle, startX, startY) {
-      this.id = Math.floor(Math.random() * 1000)
-
-      console.log('new Branch')
       this.angle = angle;
       this._startX = startX
       this._startY = startY
 
-      this.length = 20;
+      this.length = 8;
       this.width = 2; // this also represents "capacity"
 
       this.leaves = [new Leaf(this, getNewAngle(this.angle))];
@@ -41,7 +38,6 @@
     }
 
     draw(ctx) {
-      console.log(this.id + ' draw')
       ctx.strokeStyle = '#f00';
       ctx.lineWidth = this.width;
 
@@ -56,10 +52,11 @@
     }
 
     grow() {
-      console.log('grow');
-      this.branches.forEach(branch => branch.grow())
+      this.branches.forEach(branch => branch.grow());
 
-      console.log('capacity: ' + this.capacity())
+      this.leaves.forEach(leaf => leaf.grow());
+      this.prune();
+
       if (this.canGrowNewBranch()) {
         this.branches.push(new Branch(this, getNewAngle(this.angle)))
       } else if (this.canGrowNewLeaf()) {
@@ -68,6 +65,10 @@
         this.width += 1; /** TODO randomize this number to get more branches sometimes? */
         this.length += 1;
       }
+    }
+
+    prune() {
+      this.leaves = this.leaves.filter(leaf => leaf.age < 5);
     }
 
     capacity() {
