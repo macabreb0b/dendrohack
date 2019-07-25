@@ -8,6 +8,7 @@
       this.canvas = canvasEl.getContext("2d");
       this.xDim = xDim;
       this.yDim = yDim;
+
     }
 
     draw(ctx) {
@@ -29,7 +30,7 @@
 
       this.intervalId = setInterval(function() {
         sim.step(ctx);
-      }, 10);
+      }, 1);
     }
 
     stop() {

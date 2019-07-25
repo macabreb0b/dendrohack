@@ -1,12 +1,7 @@
 (function (root) {
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Leaf = DendroHack.Leaf;
-
-  const NEW_BRANCH_WIDTH = 2;
-  const NEW_BRANCH_LENGTH = 8;
-  const BRANCH_WIDTH_INCREMENT = 1;
-  const BRANCH_LENGTH_INCREMENT = .5;
-  const NEW_LEAF_SIZE = 1;
+  const Constants = DendroHack.Constants;
 
   const MAX_JANK_ANGLE = 1
   function getNewAngle(angle) {
@@ -23,8 +18,8 @@
       this._startX = startX
       this._startY = startY
 
-      this.length = NEW_BRANCH_LENGTH;
-      this.width = NEW_BRANCH_WIDTH; // this also represents "capacity"
+      this.length = Constants.NEW_BRANCH_LENGTH;
+      this.width = Constants.NEW_BRANCH_WIDTH; // this also represents "capacity"
 
       this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle))];
       // this.leaves = [];
@@ -32,11 +27,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * this.length;
+      return this.startX() + Math.cos(this.angle) * Math.sqrt(this.length);
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * this.length;
+      return this.startY() + Math.sin(this.angle) * Math.sqrt(this.length);
     }
 
     startX() {
@@ -51,7 +46,8 @@
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
       ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
-      ctx.lineWidth = this.width / (Math.PI * 2);
+      // ctx.lineWidth = this.width / (Math.PI * 2);
+      ctx.lineWidth = Math.sqrt(this.width) / Math.PI;
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
@@ -78,8 +74,8 @@
       } else if (this.canGrowSize()) {
         this.tree.drain(this.growSizeCost());
 
-        this.width += BRANCH_WIDTH_INCREMENT; /** TODO randomize this number to get more branches sometimes? */
-        this.length += BRANCH_LENGTH_INCREMENT;
+        this.width += Constants.BRANCH_WIDTH_INCREMENT; /** TODO randomize this number to get more branches sometimes? */
+        this.length += Constants.BRANCH_LENGTH_INCREMENT;
       }
     }
 
@@ -100,22 +96,28 @@
 
     canGrowNewBranch() {
       return (
-        this.width > NEW_BRANCH_WIDTH &&
-        this.capacity() >= NEW_BRANCH_WIDTH &&
-        this.branches.length < 4 &&
+        this.width > Constants.NEW_BRANCH_WIDTH &&
+        this.capacity() >= Constants.NEW_BRANCH_WIDTH &&
+        this.branches.length < Constants.BRANCH_LIMIT &&
         this.tree.energy > this.growBranchCost()
       );
     }
 
     growBranchCost() {
-      return NEW_BRANCH_WIDTH * NEW_BRANCH_LENGTH;
+      return Constants.NEW_BRANCH_WIDTH * Constants.NEW_BRANCH_LENGTH;
     }
 
     canGrowNewLeaf() {
       return (
+<<<<<<< Updated upstream
         this.capacity() >= NEW_LEAF_SIZE &&
         this.leaves.length == 0 &&
         this.width < 100 && /** only young branches can grow leaves */
+=======
+        this.capacity() >= Constants.NEW_LEAF_WIDTH &&
+        this.leaves.length < Constants.LEAF_LIMIT &&
+        this.width < Constants.MATURE_BRANCH_WIDTH && /** only young branches can grow leaves */
+>>>>>>> Stashed changes
         this.tree.energy > this.growLeafCost()
       );
     }
@@ -130,7 +132,7 @@
 
     growSizeCost() {
       const currentArea = this.width * this.length;
-      const potentialArea = (this.width + BRANCH_WIDTH_INCREMENT) * (this.length + BRANCH_LENGTH_INCREMENT);
+      const potentialArea = (this.width + Constants.BRANCH_WIDTH_INCREMENT) * (this.length + Constants.BRANCH_LENGTH_INCREMENT);
       return (potentialArea - currentArea) * 2;
     }
   }

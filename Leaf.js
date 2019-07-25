@@ -1,6 +1,6 @@
 (function (root) {
   const DendroHack = root.DendroHack = (root.DendroHack || {});
-
+  const Constants = DendroHack.Constants;
   class Leaf {
 
     constructor(parentBranch, tree, angle) {
@@ -8,15 +8,15 @@
 
       this.angle = angle;
 
-      this.length = 5;
-      this.width = 1;
+      this.length = Constants.NEW_LEAF_LENGTH;
+      this.width = Constants.NEW_LEAF_WIDTH;
 
       this.parentBranch = parentBranch;
       this.tree = tree;
     }
 
     isDead() {
-      return this.age > 5;
+      return this.age > Constants.MAX_LEAF_AGE;
     }
 
     endX() {
