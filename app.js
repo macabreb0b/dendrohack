@@ -29,7 +29,7 @@
 
       this.intervalId = setInterval(function() {
         sim.step(ctx);
-      }, 100);
+      }, 10);
     }
 
     stop() {

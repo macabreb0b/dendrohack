@@ -7,7 +7,7 @@
 
     constructor(width, height) {
       const startX = width / 2;
-      const startY = height * 3 / 4;
+      const startY = height;
 
       this.energy = 3;
 

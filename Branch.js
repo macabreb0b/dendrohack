@@ -6,7 +6,7 @@
   const NEW_BRANCH_LENGTH = 8;
   const NEW_LEAF_SIZE = 1;
 
-  const MAX_JANK_ANGLE = 1.5708
+  const MAX_JANK_ANGLE = 1
   function getNewAngle(angle) {
     return angle + MAX_JANK_ANGLE * Math.random() * (Math.random() < 0.5 ? -1 : 1)
   }
@@ -24,6 +24,7 @@
       this.width = NEW_BRANCH_WIDTH; // this also represents "capacity"
 
       this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle))];
+      // this.leaves = [];
       this.branches = [];
     }
 
@@ -46,7 +47,7 @@
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
       ctx.strokeStyle = 'rgb(' + (10 + (245 * 2 / this.width)) + ',0,0)';
-      ctx.lineWidth = this.width;
+      ctx.lineWidth = this.width / (Math.PI * 2);
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
@@ -54,8 +55,8 @@
       ctx.closePath();
       ctx.stroke();
 
-      this.leaves.forEach(leaf => leaf.draw(ctx));
       this.branches.forEach(branch => branch.draw(ctx));
+      this.leaves.forEach(leaf => leaf.draw(ctx));
     }
 
     grow() {
@@ -95,8 +96,9 @@
 
     canGrowNewBranch() {
       return (
+        this.width > NEW_BRANCH_WIDTH &&
         this.capacity() >= NEW_BRANCH_WIDTH &&
-        this.branches.length < 2 &&
+        this.branches.length < 3 &&
         this.tree.energy > this.growBranchCost()
       );
     }
@@ -109,6 +111,7 @@
       return (
         this.capacity() >= NEW_LEAF_SIZE &&
         this.leaves.length == 0 &&
+        this.width < 100 && /** only young branches can grow leaves */
         this.tree.energy > this.growLeafCost()
       );
     }
@@ -124,7 +127,7 @@
     growSizeCost() {
       const currentArea = this.width * this.length;
       const potentialArea = (this.width + 1) * (this.length + 1);
-      return potentialArea - currentArea;
+      return (potentialArea - currentArea) * 2;
     }
   }
 

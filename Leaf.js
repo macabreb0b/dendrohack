@@ -16,7 +16,7 @@
     }
 
     isDead() {
-      return this.age > 10;
+      return this.age > 3;
     }
 
     endX() {
