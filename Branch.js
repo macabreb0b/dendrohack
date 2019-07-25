@@ -51,7 +51,7 @@
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
       ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
-      ctx.lineWidth = this.width / (Math.PI * 2);
+      ctx.lineWidth = Math.sqrt(this.width) / Math.PI;
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
@@ -114,7 +114,7 @@
     canGrowNewLeaf() {
       return (
         this.capacity() >= NEW_LEAF_SIZE &&
-        this.leaves.length == 0 &&
+        this.leaves.length < 2 &&
         this.width < 100 && /** only young branches can grow leaves */
         this.tree.energy > this.growLeafCost()
       );

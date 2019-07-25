@@ -3,8 +3,6 @@
   const Branch = DendroHack.Branch;
 
   class Tree {
-
-
     constructor(width, height) {
       const startX = width / 2;
       const startY = height;
