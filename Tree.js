@@ -36,6 +36,10 @@
     drain(amount) {
       this.energy -= amount;
     }
+
+    trunkWidth() {
+      return this.startBranch.width;
+    }
   }
 
 

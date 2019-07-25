@@ -4,6 +4,8 @@
 
   const NEW_BRANCH_WIDTH = 2;
   const NEW_BRANCH_LENGTH = 8;
+  const BRANCH_WIDTH_INCREMENT = 1;
+  const BRANCH_LENGTH_INCREMENT = .5;
   const NEW_LEAF_SIZE = 1;
 
   const MAX_JANK_ANGLE = 1
@@ -14,6 +16,7 @@
   class Branch {
     constructor(parentBranch, tree, angle, startX, startY) {
       this.parentBranch = parentBranch;
+      this.order = this.parentBranch ? this.parentBranch.branches.length : null; /** save order for lining up branch ends */
       this.tree = tree;
 
       this.angle = angle;
@@ -37,6 +40,7 @@
     }
 
     startX() {
+      // which branch is it? (order according to parent branch)
       return this._startX === undefined ? this.parentBranch.endX() : this._startX;
     }
 
@@ -46,7 +50,7 @@
 
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
-      ctx.strokeStyle = 'rgb(' + (10 + (245 * 2 / this.width)) + ',0,0)';
+      ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
       ctx.lineWidth = this.width / (Math.PI * 2);
 
       ctx.beginPath();
@@ -74,8 +78,8 @@
       } else if (this.canGrowSize()) {
         this.tree.drain(this.growSizeCost());
 
-        this.width += 1; /** TODO randomize this number to get more branches sometimes? */
-        this.length += 1;
+        this.width += BRANCH_WIDTH_INCREMENT; /** TODO randomize this number to get more branches sometimes? */
+        this.length += BRANCH_LENGTH_INCREMENT;
       }
     }
 
@@ -98,7 +102,7 @@
       return (
         this.width > NEW_BRANCH_WIDTH &&
         this.capacity() >= NEW_BRANCH_WIDTH &&
-        this.branches.length < 3 &&
+        this.branches.length < 4 &&
         this.tree.energy > this.growBranchCost()
       );
     }
@@ -126,7 +130,7 @@
 
     growSizeCost() {
       const currentArea = this.width * this.length;
-      const potentialArea = (this.width + 1) * (this.length + 1);
+      const potentialArea = (this.width + BRANCH_WIDTH_INCREMENT) * (this.length + BRANCH_LENGTH_INCREMENT);
       return (potentialArea - currentArea) * 2;
     }
   }
