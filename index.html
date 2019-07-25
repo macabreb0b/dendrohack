@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>DendroHack</title>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+      }
+    </style>
+</head>
+<body>
+    <canvas width="500" height="500"></canvas>
+
+    <script src="Leaf.js"></script>
+    <script src="Branch.js"></script>
+    <script src="Tree.js"></script>
+    <script src="Environment.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        var canvas = document.getElementsByTagName("canvas")[0];
+        var width = canvas.width = window.innerWidth
+        var height = canvas.height = window.innerHeight
+
+        let app;
+        const restart = () => {
+            console.log('start');
+            if (app) app.stop();
+            app = new DendroHack.App(width, height, canvas);
+            app.start()
+        }
+
+        restart()
+
+        document.addEventListener('click', restart)
+
+    </script>
+</body>
+</html>
