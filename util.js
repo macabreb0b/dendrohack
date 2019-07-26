@@ -4,7 +4,7 @@
   Util = {
     concatRgbString: (red, blue, green) => 'rgb(' + red + ',' + blue + ',' + green + ')',
     shuffle: (array) => array.sort(() => Math.random() - 0.5),
-    constrainAngle: (angle) =>{
+    constrainAngle: (angle) => { 
       while(angle<0){
         angle+=Math.PI*2;
       }
@@ -32,7 +32,7 @@
       if(a-b > Math.PI){
         b += 2*Math.PI;
       }
-      return constrainAngle(a*m+b*(1-m));
+      return Util.constrainAngle(a*m+b*(1-m));
     }
   }
 

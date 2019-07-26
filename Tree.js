@@ -23,19 +23,20 @@
     while(squiggleTargets.length < numSquiggle){
       var radius = Math.random()*20+90;
       var angle = Util.constrainAngle(Math.random()*Math.PI-Math.PI/2);
-      const x = Math.cos(angle)*radius + this.xDim/2;
-      const y = Math.sin(angle)*radius + this.yDim/2;
+      const x = Math.cos(angle)*radius + xDim/2;
+      const y = Math.sin(angle)*radius + yDim/2;
       squiggleTargets.push(new Node(x,y));
     }
 
     while(squiggleTargets.length < numSquiggle+numTargets){
       var radius = Math.random()*50+10;
         var angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
-        const x = Math.cos(angle)*radius + this.xDim/2;
-        const y = Math.sin(angle)*radius + this.yDim/2-50;
+        const x = Math.cos(angle)*radius + xDim/2;
+        const y = Math.sin(angle)*radius + yDim/2-50;
         
-        targets.push(new Node(x, y));
+        squiggleTargets.push(new Node(x, y));
     }
+    return squiggleTargets;
   }
 
   class Tree {

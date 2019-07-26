@@ -4,11 +4,7 @@
   const Constants = DendroHack.Constants;
   const Util = DendroHack.Util;
 
-<<<<<<< Updated upstream
-  const MAX_JANK_ANGLE = Math.PI / 4;
-=======
   const MAX_JANK_ANGLE = Math.PI / 5;
->>>>>>> Stashed changes
   function getNewAngle(angle, other) {
     let correction = 0;
     other.forEach(branch => {
