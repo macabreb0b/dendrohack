@@ -39,7 +39,7 @@
   }
 
   class Tree {
-    constructor(width, height) {
+    constructor(width, height, userGeneratedTargets) {
       const startX = width / 2;
       const startY = height;
       this.startBranch = new Branch(
@@ -49,7 +49,12 @@
         startX, /** only root branch gets startX / startY */
         startY, /** only root branch gets startX / startY */
       )
-      this.targets = generateRandomTargets(width, height, 15);
+      if (userGeneratedTargets) {
+        this.targets = userGeneratedTargets.map(coord => new Node(coord.x, coord.y, this.startBranch))
+      } else {
+        console.error(userGeneratedTargets, 'is not a list of targets')
+        this.targets = generateRandomTargets(width, height, 15);
+      }
       this.energy = 3;
     }
 
@@ -61,7 +66,13 @@
       this.targets.forEach(target => {
         ctx.strokeStyle = 'rgb(255,0,0)';
         ctx.beginPath();
-        ctx.arc(target.x, target.y, 10, 0, Math.PI*2);
+        ctx.arc(
+          target.x,
+          target.y,
+          10,
+          0,
+          Math.PI*2,
+        );
         ctx.stroke();
         ctx.closePath();
       })

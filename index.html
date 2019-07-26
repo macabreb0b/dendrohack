@@ -34,17 +34,54 @@
     <script>
         var canvas = document.getElementsByTagName("canvas")[0];
         var width = canvas.width = window.innerWidth
-        var height = canvas.height = window.innerHeight
+        var height = canvas.height = window.innerHeight + 50; // add button height
 
+        window.userGeneratedTargets = [];
+        let sprayInterval = null;
+        let translatedMouseX = 0;
+        let translatedMouseY = 0;
+        document.addEventListener('mousemove', () => {
+            translatedMouseX = event.clientX;
+            translatedMouseY = event.clientY;
+        });
+        document.addEventListener("mousedown", () => {
+            window.sprayInterval = setInterval(() => {
+                const radius = Math.random()*100;
+                const angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
+                let x = translatedMouseX
+                let y = translatedMouseY
+                window.userGeneratedTargets.push({x, y});
+                let ctx = canvas.getContext("2d");
+                ctx.strokeStyle = 'rgb(255,0,0)';
+                ctx.beginPath();
+                ctx.arc(
+                  x,
+                  y,
+                  10,
+                  0,
+                  Math.PI*2,
+                );
+                ctx.stroke();
+                ctx.closePath();
+            }, 100)
+        });
+    
+        document.addEventListener("mouseup", () => {
+            window.clearInterval(window.sprayInterval);
+        });
+        
         let app;
         const restart = () => {
             if (app) app.stop();
-            app = new DendroHack.App(width, height, canvas);
+            app = new DendroHack.App(width, height, canvas, window.userGeneratedTargets);
             app.start()
         }
-        restart();
 
-        document.getElementById('startButton').addEventListener('click', restart)
+        document.getElementById('startButton').addEventListener('click', (event) => {
+            event.preventDefault()
+            clearInterval(window.sprayInterval)
+            restart()
+        })
 
     </script>
 </body>
