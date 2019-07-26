@@ -30,6 +30,17 @@
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
   }
 
+  function getBranchColor(branchWidth, trunkWidth) {
+    const black = [0, 0, 0];
+    const brown = [222, 184, 135];
+    const factor = 1 - (branchWidth * 2) / trunkWidth;
+    const red = black[0] + (brown[0] - black[0]) * factor;
+    const blue = black[1] + (brown[1] - black[1]) * factor;
+    const green = black[2] + (brown[2] - black[2]) * factor;
+
+    return Util.concatRgbString(red, blue, green);
+  }
+
   class Branch {
     constructor(parentBranch, tree, angle, startX, startY) {
       this.parentBranch = parentBranch;
@@ -67,13 +78,7 @@
 
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
-      const black = [0, 0, 0];
-      const brown = [222, 184, 135];
-      const factor = 1 - (this.width * 2) / this.tree.trunkWidth();
-      const red = black[0] + (brown[0] - black[0]) * factor
-      const blue = black[1] + (brown[1] - black[1]) * factor
-      const green = black[2] + (brown[2] - black[2]) * factor
-      ctx.strokeStyle = Util.concatRgbString(red, blue, green);
+      ctx.strokeStyle = getBranchColor(this.width, this.tree.trunkWidth());
 
       ctx.lineWidth = 2 * Math.log(this.width);
 
