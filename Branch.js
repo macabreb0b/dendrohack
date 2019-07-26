@@ -66,11 +66,13 @@
       this.prune();
 
       if (this.canGrowNewBranch()) {
+        this.tree.drain(this.growBranchCost());
         this.branches.unshift(new Branch(this, this.tree, getNewAngle(this.angle)))
-        this.tree.drain(this.growBranchCost())
+
       } else if (this.canGrowNewLeaf()) {
+        this.tree.drain(this.growLeafCost());
         this.leaves.push(new Leaf(this, this.tree, getNewAngle(this.angle)))
-        this.tree.drain(this.growLeafCost())
+
       } else if (this.canGrowSize()) {
         this.tree.drain(this.growSizeCost());
 

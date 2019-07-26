@@ -36,8 +36,9 @@
     }
 
     draw(ctx) {
-      ctx.strokeStyle = '#32CD32';
-      ctx.lineWidth = this.width;
+      ctx.strokeStyle = 'rgb(' + 50  + ',' + (100 + (105 - this.age * (105 / Constants.MAX_LEAF_AGE))) + ',' + 50 + ')';
+      // ctx.strokeStyle = '#32CD32';
+      ctx.lineWidth = this.width * 10;
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());

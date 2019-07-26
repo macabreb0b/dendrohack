@@ -30,7 +30,7 @@
     }
 
     feed() {
-      this.energy += 1;
+      this.energy += DendroHack.Constants.LEAF_ENERGY;
     }
 
     drain(amount) {
