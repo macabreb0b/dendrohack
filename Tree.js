@@ -21,10 +21,16 @@
     }
 
     draw(ctx) {
-      this.startBranch.draw(ctx)
+      // Draw branches
+      this.startBranch.draw(ctx);
+
+      // Draw targets
       this.targets.forEach(target => {
+        ctx.strokeStyle = 'rgb(255,0,0)';
+        ctx.beginPath();
         ctx.arc(target.x, target.y, 10, 0, Math.PI*2);
         ctx.stroke();
+        ctx.closePath();
       })
       console.log(this.energy);
     }
