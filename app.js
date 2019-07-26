@@ -19,10 +19,6 @@
     step() {
       this.draw(this.canvas);
       this.tree.grow();
-
-      if (this.tree.targets.length === 0) {
-        this.stop();
-      }
     }
 
     start() {

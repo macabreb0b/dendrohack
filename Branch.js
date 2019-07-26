@@ -102,11 +102,7 @@
         const influencingTargets = [];
         for (let target of this.tree.targets){
             if(target.closestBranch === this){
-                console.log(target.closestBranch, this)
                 influencingTargets.push(target);
-            } else {
-                // debugger
-
             }
         }
         return influencingTargets;
@@ -146,10 +142,14 @@
       if (this.canGrowNewBranch()) {
         this.tree.drain(this.growBranchCost());
         const vector = this.getPullVector();
-        const targetedAngle = Util.constrainAngle(Util.getAngle(vector.dx, vector.dy));
         const randomAngle = Util.constrainAngle(getNewAngle(this.angle, this.branches));
-        const angleMix = Util.getAngleMix(targetedAngle, randomAngle, Constants.TARGETED_ANGLE_WEIGHT);
-        console.log(targetedAngle +" "+randomAngle+" "+angleMix);
+        let angleMix = randomAngle;
+        if (vector) {
+          // Only mix the angles if there are targets that influence the angle of this branch
+          const targetedAngle = Util.constrainAngle(Util.getAngle(vector.dx, vector.dy));
+          angleMix = Util.getAngleMix(targetedAngle, randomAngle, Constants.TARGETED_ANGLE_WEIGHT);
+          console.log(targetedAngle +" "+randomAngle+" "+angleMix);
+        }
         const branch = new Branch(
           this,
           this.tree,
@@ -185,7 +185,6 @@
               i--;
           } else if (dist < target.closestDist){
               // Update the closest target and associated distance in the array.
-              debugger
               target.closestDist = dist;
               target.closestBranch = this;
           }

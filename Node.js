@@ -5,7 +5,7 @@
         constructor(x, y, closestBranch){
             this.x = x;
             this.y = y;
-            this.captureRadius = 625;
+            this.captureRadius = DendroHack.Constants.TARGET_CAPTURE_RADIUS;
             this.closestDist = Number.MAX_VALUE;
             this.closestBranch = closestBranch;
         }
