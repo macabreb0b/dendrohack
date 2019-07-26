@@ -34,7 +34,7 @@
       })
       //console.log(this.energy);
     }
-
+    
     grow() {
       this.startBranch.grow();
     }

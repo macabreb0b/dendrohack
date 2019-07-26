@@ -5,6 +5,9 @@
         constructor(x, y){
             this.x = x;
             this.y = y;
+            this.captureRadius = 625;
+            this.closestDist = Number.MAX_VALUE;
+            this.closestBranch = null;
         }
 
         /**

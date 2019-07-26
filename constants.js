@@ -50,14 +50,14 @@
     NEW_LEAF_WIDTH: 1,
     NEW_LEAF_LENGTH: 15,
     BRANCH_WIDTH_INCREMENT: 1,
-    BRANCH_LENGTH_INCREMENT: 0,
+    BRANCH_LENGTH_INCREMENT: 0.1,
     MATURE_BRANCH_WIDTH: 20,
     BRANCH_LIMIT: 2,
     LEAF_LIMIT: 1,
     LEAF_ENERGY: 5,
   };
 
-  DendroHack.Constants = A_DOPE_TREE;
+  DendroHack.Constants = CURRENT;
 
   return root;
 })(this);

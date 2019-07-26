@@ -105,8 +105,8 @@
       return this._startY === undefined ? this.parentBranch.endY() : this._startY;
     }
 
-    getPullVector(){
-      const targets = this.tree.targets;
+    getPullVector() {
+      const targets = this.getInfluencingTargets();
       const vector = {dx:0, dy:0}
       targets.forEach(target => {
           const ex = this.endX();
@@ -116,6 +116,16 @@
           vector.dy += (target.y - ey)/dist
       });
       return vector;
+    }
+
+    getInfluencingTargets(){
+        const influencingTargets = [];
+        for (let target of this.tree.targets){
+            if(target.closestBranch === this){
+                influencingTargets.push(target);
+            }
+        }
+        return influencingTargets;
     }
 
     draw(ctx) {
@@ -153,13 +163,7 @@
           this.tree,
           angleMix)
         this.branches.unshift(branch)
-        // Capture targets
-        for(var i = 0;i<this.tree.targets.length;i++){
-          if(this.tree.targets[i].L2_norm(branch.endX(),branch.endY()) <= 625){
-              this.tree.targets.splice(i,1);
-              i--;
-          }
-        }
+        this.captureTargetsAndUpdateTargetDistances();
 
       } else if (this.canGrowNewLeaf()) {
         this.tree.drain(this.growLeafCost());
@@ -175,6 +179,23 @@
         this.width += Constants.BRANCH_WIDTH_INCREMENT; /** TODO randomize this number to get more branches sometimes? */
         this.length += Constants.BRANCH_LENGTH_INCREMENT;
       }
+    }
+
+    captureTargetsAndUpdateTargetDistances() {
+        // Capture targets and update distances
+        for(var i = 0;i<this.tree.targets.length;i++){
+          const target = this.tree.targets[i];
+          const dist = target.L2_norm(this.endX(),this.endY());
+
+          if(dist <= target.captureRadius){
+              this.tree.targets.splice(i,1);
+              i--;
+          } else if (dist < target.closestDist){
+              // Update the closest target and associated distance in the array.
+              target.closestDist = dist;
+              target.closestBranch = this;
+          }
+        }
     }
 
     prune() {
