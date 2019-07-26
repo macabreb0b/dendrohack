@@ -48,11 +48,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * 4*Math.sqrt(this.length);
+      return this.startX() + Math.cos(this.angle) * 8*Math.sqrt(this.length);
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * 4*Math.sqrt(this.length);
+      return this.startY() + Math.sin(this.angle) * 8*Math.sqrt(this.length);
     }
 
     startX() {
@@ -66,9 +66,15 @@
 
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
-      ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
+      const black = [0, 0, 0];
+      const brown = [222, 184, 135];
+      const factor = 1-(this.width*2)/this.tree.trunkWidth();
+      const color = [black[0]+(brown[0]-black[0])*factor,
+                     black[1]+(brown[1]-black[1])*factor,
+                     black[2]+(brown[2]-black[2])*factor]
+      ctx.strokeStyle = 'rgb('+color[0]+','+color[1]+','+color[2]+')';
       // ctx.lineWidth = this.width / (Math.PI * 2);
-      ctx.lineWidth = Math.log(this.width);
+      ctx.lineWidth = 2*Math.log(this.width);
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());

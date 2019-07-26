@@ -8,7 +8,6 @@
     constructor(width, height) {
       const startX = width / 2;
       const startY = height;
-
       this.energy = 3;
 
       this.startBranch = new Branch(
@@ -26,7 +25,6 @@
 
     grow() {
       this.startBranch.grow();
-      console.log(this.energy);
     }
 
     feed() {
