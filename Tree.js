@@ -32,7 +32,7 @@
         ctx.stroke();
         ctx.closePath();
       })
-      console.log(this.energy);
+      //console.log(this.energy);
     }
 
     grow() {

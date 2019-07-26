@@ -4,7 +4,7 @@
   const Constants = DendroHack.Constants;
   const Util = DendroHack.Util;
 
-  const MAX_JANK_ANGLE = Math.PI / 8;
+  const MAX_JANK_ANGLE = Math.PI * 5 / 24;
   function getNewAngle(angle, other) {
     var correction = 0;
     other.forEach(branch => {
@@ -15,7 +15,40 @@
         correction--;
       }
     })
-    return angle + MAX_JANK_ANGLE * (randn_bm() * .2 + 1) * (Math.random() < (0.5) ? -1 : 1)
+    return angle + MAX_JANK_ANGLE * (Math.random()) * (Math.random() < (0.5) ? -1 : 1)
+  }
+
+  function constrainAngle(angle){
+    while(angle<0){
+      angle+=Math.PI*2;
+    }
+    while(angle>2*Math.PI){
+      angle-=Math.PI*2
+    }
+    return angle;
+  }
+
+  function getAngle(x, y){
+    const angle = Math.atan2(y,x);
+    return angle;
+  }
+
+  function getAngleMix(angle1, angle2, mix){//angle1*mix + angle2*(1-mix)
+    var a, b, m;
+    if(angle1 > angle2){
+      a = angle1;
+      b = angle2;
+      m = mix
+    }
+    else{
+      a = angle2;
+      b = angle1;
+      m = 1-mix;
+    }
+    if(a-b > Math.PI){
+      b += 2*Math.PI;
+    }
+    return constrainAngle(a*m+b*(1-m));
   }
 
   // Standard Normal variate using Box-Muller transform.
@@ -79,16 +112,10 @@
           const ex = this.endX();
           const ey = this.endY();
           const dist = target.L2_norm(ex, ey);
-          console.log("dist "+dist) 
           vector.dx += (target.x - ex)/dist
           vector.dy += (target.y - ey)/dist
       });
       return vector;
-    }
-
-    getAngle(x, y){
-      const angle = Math.atan2(y,x);
-      return angle;
     }
 
     draw(ctx) {
@@ -117,9 +144,10 @@
       if (this.canGrowNewBranch()) {
         this.tree.drain(this.growBranchCost());
         const vector = this.getPullVector();
-        const angle = this.getAngle(vector.dx, vector.dy);
-        const oldAngle = getNewAngle(this.angle, this.branches);
-        const angleMix = angle;
+        const targetedAngle = constrainAngle(getAngle(vector.dx, vector.dy));
+        const randomAngle = constrainAngle(getNewAngle(this.angle, this.branches));
+        const angleMix = getAngleMix(targetedAngle, randomAngle, .15);
+        console.log(targetedAngle +" "+randomAngle+" "+angleMix);
         const branch = new Branch(
           this, 
           this.tree,
@@ -166,6 +194,7 @@
 
     canGrowNewBranch() {
       return (
+        this.tree.targets.length > 0 &&
         this.width > Constants.NEW_BRANCH_WIDTH &&
         this.capacity() >= Constants.NEW_BRANCH_WIDTH &&
         this.branches.length < Constants.BRANCH_LIMIT &&
