@@ -45,12 +45,23 @@
       this._startX = startX
       this._startY = startY
 
-      this.length = Constants.NEW_BRANCH_LENGTH;
+      this.setLevel() /** set level before setting length */
+      this.length = (.9 ** this.level) * Constants.NEW_BRANCH_LENGTH;
       this.width = Constants.NEW_BRANCH_WIDTH; // this also represents "capacity"
 
       this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle, []))];
       // this.leaves = [];
       this.branches = [];
+    }
+
+    setLevel() {
+      let level = 0;
+      let currentBranch = this;
+      while (currentBranch) {
+        level += 1;
+        currentBranch = currentBranch.parentBranch;
+      }
+      this.level = level;
     }
 
     endX() {
@@ -121,7 +132,7 @@
       this.branches.forEach(branch => branch.drawLeaves(ctx));
     }
 
-    grow() {  
+    grow() {
       var indices = []
       for(var i =0;i<this.branches.length;i++){
         indices.push(i);
@@ -137,12 +148,13 @@
         const vector = this.getPullVector();
         const targetedAngle = Util.constrainAngle(Util.getAngle(vector.dx, vector.dy));
         const randomAngle = Util.constrainAngle(getNewAngle(this.angle, this.branches));
-        const angleMix = Util.getAngleMix(targetedAngle, randomAngle, .15);
+        const angleMix = Util.getAngleMix(targetedAngle, randomAngle, Constants.TARGETED_ANGLE_WEIGHT);
         console.log(targetedAngle +" "+randomAngle+" "+angleMix);
         const branch = new Branch(
           this,
           this.tree,
-          angleMix)
+          angleMix,
+        )
         this.branches.unshift(branch)
         this.captureTargetsAndUpdateTargetDistances();
 
