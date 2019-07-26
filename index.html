@@ -2,22 +2,24 @@
 <head>
     <title>DendroHack</title>
     <style>
-      html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-      }
-        button {
-            position: absolute;
+        html, body {
             width: 100%;
+            height: 100%;
+            margin: 0px;
+        }
+        #startButton {
+            position: absolute;
+            width: 80px;
             height: 50px;
             background-color: greenyellow;
-            font-size: 22px;
+            font-size: 20px;
+            top: 25px;
+            right: 25px;
         }
     </style>
 </head>
 <body>
-    <button id="start-button">Grow!!!!!</button>
+    <button id="startButton">Grow</button>
     <canvas width="500" height="500"></canvas>
 
     <script src="util.js"></script>
@@ -40,8 +42,9 @@
             app = new DendroHack.App(width, height, canvas);
             app.start()
         }
+        restart();
 
-        document.getElementById('start-button').addEventListener('click', restart)
+        document.getElementById('startButton').addEventListener('click', restart)
 
     </script>
 </body>

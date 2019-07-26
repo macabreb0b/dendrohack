@@ -28,11 +28,11 @@
 
   function getBranchColor(branchWidth, trunkWidth) {
     const factor =  (branchWidth * 2) / trunkWidth;
-    const red = 212 - (192 * factor);
-    const green = 200 - (180 * factor);
-    const blue = 125 - (110 * factor);
+    const red = 250 - (242 * factor);
+    const green = 210 - (180 * factor);
+    const blue = 100 - (90 * factor);
 
-    return Util.concatRgbString(red, blue, green);
+    return Util.concatRgbString(red, green, blue);
   }
 
   class Branch {

@@ -8,7 +8,7 @@
     }
 
     draw(ctx) {
-      ctx.fillStyle = "lightblue";
+      ctx.fillStyle = "white";
       ctx.fillRect(0, 0, this.xDim, this.yDim);
     }
   }
