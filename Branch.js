@@ -4,7 +4,7 @@
   const Constants = DendroHack.Constants;
   const Util = DendroHack.Util;
 
-  const MAX_JANK_ANGLE = Math.PI / 8;
+  const MAX_JANK_ANGLE = Math.PI / 4;
   function getNewAngle(angle, other) {
     var correction = 0;
     other.forEach(branch => {
@@ -27,14 +27,16 @@
   }
 
   function getBranchColor(branchWidth, trunkWidth) {
-    const black = [0, 0, 0];
-    const brown = [222, 184, 135];
-    const factor = 1 - (branchWidth * 2) / trunkWidth;
-    const red = black[0] + (brown[0] - black[0]) * factor;
-    const blue = black[1] + (brown[1] - black[1]) * factor;
-    const green = black[2] + (brown[2] - black[2]) * factor;
+    const red = 255 - (245 * ((branchWidth) / trunkWidth))
 
-    return Util.concatRgbString(red, blue, green);
+    // const black = [10, 20, 10];
+    // const brown = [212, 164, 125];
+    // const factor =  trunkWidth / (branchWidth);
+    // const red = black[0] + (brown[0] - black[0]) * factor;
+    // const blue = black[1] + (brown[1] - black[1]) * factor;
+    // const green = black[2] + (brown[2] - black[2]) * factor;
+
+    return Util.concatRgbString(red, 0, 0);
   }
 
   class Branch {
@@ -79,7 +81,7 @@
           const ex = this.endX();
           const ey = this.endY();
           const dist = target.L2_norm(ex, ey);
-          console.log("dist "+dist) 
+          console.log("dist "+dist)
           vector.dx += (target.x - ex)/dist
           vector.dy += (target.y - ey)/dist
       });
@@ -104,7 +106,11 @@
       ctx.stroke();
 
       this.branches.forEach(branch => branch.draw(ctx));
+    }
+
+    drawLeaves(ctx) {
       this.leaves.forEach(leaf => leaf.draw(ctx));
+      this.branches.forEach(branch => branch.drawLeaves(ctx));
     }
 
     grow() {
@@ -121,7 +127,7 @@
         const oldAngle = getNewAngle(this.angle, this.branches);
         const angleMix = angle;
         const branch = new Branch(
-          this, 
+          this,
           this.tree,
           angleMix)
         this.branches.unshift(branch)

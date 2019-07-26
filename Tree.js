@@ -21,7 +21,9 @@
     }
 
     draw(ctx) {
-      this.startBranch.draw(ctx)
+      this.startBranch.draw(ctx);
+      this.startBranch.drawLeaves(ctx);
+
       this.targets.forEach(target => {
         ctx.arc(target.x, target.y, 10, 0, Math.PI*2);
         ctx.stroke();
