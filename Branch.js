@@ -27,11 +27,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * this.length / 2;
+      return this.startX() + Math.cos(this.angle) * this.length;
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * this.length / 2;
+      return this.startY() + Math.sin(this.angle) * this.length;
     }
 
     startX() {
@@ -47,7 +47,7 @@
       /** use width to compute rgb value; higher width => lower number (darker shade) */
       ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
       // ctx.lineWidth = this.width / (Math.PI * 2);
-      ctx.lineWidth = Math.sqrt(this.width) / Math.PI;
+      ctx.lineWidth = Math.sqrt(this.width);
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
