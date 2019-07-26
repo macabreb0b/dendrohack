@@ -27,11 +27,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * Math.sqrt(this.length);
+      return this.startX() + Math.cos(this.angle) * this.length / 2;
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * Math.sqrt(this.length);
+      return this.startY() + Math.sin(this.angle) * this.length / 2;
     }
 
     startX() {
@@ -109,15 +109,9 @@
 
     canGrowNewLeaf() {
       return (
-<<<<<<< Updated upstream
-        this.capacity() >= NEW_LEAF_SIZE &&
-        this.leaves.length == 0 &&
-        this.width < 100 && /** only young branches can grow leaves */
-=======
         this.capacity() >= Constants.NEW_LEAF_WIDTH &&
         this.leaves.length < Constants.LEAF_LIMIT &&
         this.width < Constants.MATURE_BRANCH_WIDTH && /** only young branches can grow leaves */
->>>>>>> Stashed changes
         this.tree.energy > this.growLeafCost()
       );
     }
