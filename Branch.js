@@ -4,7 +4,11 @@
   const Constants = DendroHack.Constants;
   const Util = DendroHack.Util;
 
+<<<<<<< Updated upstream
   const MAX_JANK_ANGLE = Math.PI / 4;
+=======
+  const MAX_JANK_ANGLE = Math.PI / 5;
+>>>>>>> Stashed changes
   function getNewAngle(angle, other) {
     let correction = 0;
     other.forEach(branch => {
@@ -16,39 +20,6 @@
       }
     })
     return angle + MAX_JANK_ANGLE * (Math.random()) * (Math.random() < (0.5) ? -1 : 1)
-  }
-
-  function constrainAngle(angle){
-    while(angle<0){
-      angle+=Math.PI*2;
-    }
-    while(angle>2*Math.PI){
-      angle-=Math.PI*2
-    }
-    return angle;
-  }
-
-  function getAngle(x, y){
-    const angle = Math.atan2(y,x);
-    return angle;
-  }
-
-  function getAngleMix(angle1, angle2, mix){//angle1*mix + angle2*(1-mix)
-    let a, b, m;
-    if(angle1 > angle2){
-      a = angle1;
-      b = angle2;
-      m = mix
-    }
-    else{
-      a = angle2;
-      b = angle1;
-      m = 1-mix;
-    }
-    if(a-b > Math.PI){
-      b += 2*Math.PI;
-    }
-    return constrainAngle(a*m+b*(1-m));
   }
 
   // Standard Normal variate using Box-Muller transform.
@@ -87,11 +58,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * 8 * Math.sqrt(this.length); // Note: actual length of branch is not the same as this.length uhhh woops.
+      return this.startX() + Math.cos(this.angle) * this.length; // Note: actual length of branch is not the same as this.length uhhh woops.
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * 8 * Math.sqrt(this.length);
+      return this.startY() + Math.sin(this.angle) * this.length;
     }
 
     startX() {
@@ -136,9 +107,13 @@
       this.branches.forEach(branch => branch.drawLeaves(ctx));
     }
 
-    grow() {
-      if (Math.random() < .5) Util.shuffle(this.branches);
-      this.branches.forEach(branch => branch.grow());
+    grow() {  
+      var indices = []
+      for(var i =0;i<this.branches.length;i++){
+        indices.push(i);
+      }
+      Util.shuffle(indices);
+      indices.forEach(index => this.branches[index].grow());
 
       this.leaves.forEach(leaf => leaf.grow());
       this.prune();
@@ -146,9 +121,9 @@
       if (this.canGrowNewBranch()) {
         this.tree.drain(this.growBranchCost());
         const vector = this.getPullVector();
-        const targetedAngle = constrainAngle(getAngle(vector.dx, vector.dy));
-        const randomAngle = constrainAngle(getNewAngle(this.angle, this.branches));
-        const angleMix = getAngleMix(targetedAngle, randomAngle, .15);
+        const targetedAngle = Util.constrainAngle(Util.getAngle(vector.dx, vector.dy));
+        const randomAngle = Util.constrainAngle(getNewAngle(this.angle, this.branches));
+        const angleMix = Util.getAngleMix(targetedAngle, randomAngle, .15);
         console.log(targetedAngle +" "+randomAngle+" "+angleMix);
         const branch = new Branch(
           this,

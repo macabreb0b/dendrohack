@@ -17,11 +17,32 @@
     return targets
   }
 
+  generateSquiggleTargets = (xDim, yDim, numSquiggle, numTargets) => {
+    var squiggleTargets = []
+    // Squiggle
+    while(squiggleTargets.length < numSquiggle){
+      var radius = Math.random()*20+90;
+      var angle = Util.constrainAngle(Math.random()*Math.PI-Math.PI/2);
+      const x = Math.cos(angle)*radius + this.xDim/2;
+      const y = Math.sin(angle)*radius + this.yDim/2;
+      squiggleTargets.push(new Node(x,y));
+    }
+
+    while(squiggleTargets.length < numSquiggle+numTargets){
+      var radius = Math.random()*50+10;
+        var angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
+        const x = Math.cos(angle)*radius + this.xDim/2;
+        const y = Math.sin(angle)*radius + this.yDim/2-50;
+        
+        targets.push(new Node(x, y));
+    }
+  }
+
   class Tree {
     constructor(width, height) {
       const startX = width / 2;
       const startY = height;
-      this.targets = generateRandomTargets(width, height, 30);
+      this.targets = generateSquiggleTargets(width, height, 35, 15);
       this.energy = 3;
 
       this.startBranch = new Branch(
