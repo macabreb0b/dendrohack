@@ -3,9 +3,30 @@
   const Leaf = DendroHack.Leaf;
   const Constants = DendroHack.Constants;
 
-  const MAX_JANK_ANGLE = 1
-  function getNewAngle(angle) {
-    return angle + MAX_JANK_ANGLE * Math.random() * (Math.random() < 0.5 ? -1 : 1)
+  const MAX_JANK_ANGLE = Math.PI/8;
+  function getNewAngle(angle, other) {
+    var correction = 0;
+    other.forEach(branch => {
+      if(angle > branch.angle){
+        correction++;
+      } 
+      else {
+        correction--;
+      }
+    })
+    return angle + MAX_JANK_ANGLE * (randn_bm()*.2+1) * (Math.random() < (0.5-.2*correction) ? -1 : 1)
+  }
+
+  function shuffle(array) {
+    array.sort(() => Math.random() - 0.5);
+  }
+
+  // Standard Normal variate using Box-Muller transform.
+  function randn_bm() {
+    var u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
   }
 
   class Branch {
@@ -21,17 +42,17 @@
       this.length = Constants.NEW_BRANCH_LENGTH;
       this.width = Constants.NEW_BRANCH_WIDTH; // this also represents "capacity"
 
-      this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle))];
+      this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle, []))];
       // this.leaves = [];
       this.branches = [];
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * this.length;
+      return this.startX() + Math.cos(this.angle) * 4*Math.sqrt(this.length);
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * this.length;
+      return this.startY() + Math.sin(this.angle) * 4*Math.sqrt(this.length);
     }
 
     startX() {
@@ -47,7 +68,7 @@
       /** use width to compute rgb value; higher width => lower number (darker shade) */
       ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
       // ctx.lineWidth = this.width / (Math.PI * 2);
-      ctx.lineWidth = Math.sqrt(this.width);
+      ctx.lineWidth = Math.log(this.width);
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
@@ -60,16 +81,17 @@
     }
 
     grow() {
+      if(Math.random()<.5) shuffle(this.branches);
       this.branches.forEach(branch => branch.grow());
 
       this.leaves.forEach(leaf => leaf.grow());
       this.prune();
 
       if (this.canGrowNewBranch()) {
-        this.branches.unshift(new Branch(this, this.tree, getNewAngle(this.angle)))
+        this.branches.unshift(new Branch(this, this.tree, getNewAngle(this.angle, this.branches)))
         this.tree.drain(this.growBranchCost())
       } else if (this.canGrowNewLeaf()) {
-        this.leaves.push(new Leaf(this, this.tree, getNewAngle(this.angle)))
+        this.leaves.push(new Leaf(this, this.tree, getNewAngle(this.angle, [])))
         this.tree.drain(this.growLeafCost())
       } else if (this.canGrowSize()) {
         this.tree.drain(this.growSizeCost());
