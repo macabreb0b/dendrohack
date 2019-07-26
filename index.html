@@ -16,9 +16,18 @@
             top: 25px;
             right: 25px;
         }
+        #clearButton {
+            position: absolute;
+            width: 80px;
+            height: 50px;
+            font-size: 20px;
+            top: 25px;
+            right: 120px;
+        }
     </style>
 </head>
 <body>
+    <button id="clearButton">Clear</button>
     <button id="startButton">Grow</button>
     <canvas width="500" height="500"></canvas>
 
@@ -81,6 +90,15 @@
             event.preventDefault()
             clearInterval(window.sprayInterval)
             restart()
+        })
+
+        document.getElementById('clearButton').addEventListener('click', (event) => {
+            event.preventDefault()
+            if (app) app.stop();
+            clearInterval(window.sprayInterval)
+            window.userGeneratedTargets = []
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         })
 
     </script>
