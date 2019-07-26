@@ -36,15 +36,22 @@
     }
 
     draw(ctx) {
-      ctx.strokeStyle = 'rgb(' + 50  + ',' + (100 + (105 - this.age * (105 / Constants.MAX_LEAF_AGE))) + ',' + 50 + ')';
-      // ctx.strokeStyle = '#32CD32';
-      ctx.lineWidth = this.width * 10;
+      const leafColor = 'rgb(' + 50  + ',' + (100 + (105 - this.age * (105 / Constants.MAX_LEAF_AGE))) + ',' + 50 + ')';
+      ctx.strokeStyle = leafColor;
+      ctx.fillStyle = leafColor;
+      ctx.lineWidth = this.width;
+
+      const dx = this.endX() - this.startX();
+      const dy = this.endY() - this.startY();
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
+      ctx.lineTo(this.startX() + 1 / 3 * dx, this.startY() + 2 / 3 * dy);
       ctx.lineTo(this.endX(), this.endY());
+      ctx.lineTo(this.startX() + 2 / 3 * dx, this.startY() + 1 / 3 * dy);
       ctx.closePath();
       ctx.stroke();
+      ctx.fill();
     }
 
     grow() {
