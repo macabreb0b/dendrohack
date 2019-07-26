@@ -3,7 +3,7 @@
   const Leaf = DendroHack.Leaf;
   const Constants = DendroHack.Constants;
 
-  const MAX_JANK_ANGLE = Math.PI/8;
+  const MAX_JANK_ANGLE = Math.PI / 8;
   function getNewAngle(angle, other) {
     var correction = 0;
     other.forEach(branch => {
@@ -14,7 +14,7 @@
         correction--;
       }
     })
-    return angle + MAX_JANK_ANGLE * (randn_bm()*.2+1) * (Math.random() < (0.5-.2*correction) ? -1 : 1)
+    return angle + MAX_JANK_ANGLE * (randn_bm() * .2 + 1) * (Math.random() < (0.5 - .2 * correction) ? -1 : 1)
   }
 
   function shuffle(array) {
@@ -48,11 +48,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * 8*Math.sqrt(this.length);
+      return this.startX() + Math.cos(this.angle) * 8 * Math.sqrt(this.length);
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * 8*Math.sqrt(this.length);
+      return this.startY() + Math.sin(this.angle) * 8 * Math.sqrt(this.length);
     }
 
     startX() {
@@ -68,13 +68,13 @@
       /** use width to compute rgb value; higher width => lower number (darker shade) */
       const black = [0, 0, 0];
       const brown = [222, 184, 135];
-      const factor = 1-(this.width*2)/this.tree.trunkWidth();
-      const color = [black[0]+(brown[0]-black[0])*factor,
-                     black[1]+(brown[1]-black[1])*factor,
-                     black[2]+(brown[2]-black[2])*factor]
-      ctx.strokeStyle = 'rgb('+color[0]+','+color[1]+','+color[2]+')';
-      // ctx.lineWidth = this.width / (Math.PI * 2);
-      ctx.lineWidth = 2*Math.log(this.width);
+      const factor = 1 - (this.width * 2) / this.tree.trunkWidth();
+      const color = [black[0] + (brown[0] - black[0]) * factor,
+                     black[1] + (brown[1] - black[1]) * factor,
+                     black[2] + (brown[2] - black[2]) * factor]
+      ctx.strokeStyle = 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+
+      ctx.lineWidth = 2 * Math.log(this.width);
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
