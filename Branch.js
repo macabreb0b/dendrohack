@@ -15,7 +15,7 @@
         correction--;
       }
     })
-    return angle + MAX_JANK_ANGLE * (randn_bm() * .2 + 1) * (Math.random() < (0.5 - .2 * correction) ? -1 : 1)
+    return angle + MAX_JANK_ANGLE * (randn_bm() * .2 + 1) * (Math.random() < (0.5) ? -1 : 1)
   }
 
   // Standard Normal variate using Box-Muller transform.
@@ -56,7 +56,7 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * 8 * Math.sqrt(this.length);
+      return this.startX() + Math.cos(this.angle) * 8 * Math.sqrt(this.length); // Note: actual length of branch is not the same as this.length uhhh woops.
     }
 
     endY() {
@@ -70,6 +70,25 @@
 
     startY() {
       return this._startY === undefined ? this.parentBranch.endY() : this._startY;
+    }
+
+    getPullVector(){
+      const targets = this.tree.targets;
+      const vector = {dx:0, dy:0}
+      targets.forEach(target => {
+          const ex = this.endX();
+          const ey = this.endY();
+          const dist = target.L2_norm(ex, ey);
+          console.log("dist "+dist) 
+          vector.dx += (target.x - ex)/dist
+          vector.dy += (target.y - ey)/dist
+      });
+      return vector;
+    }
+
+    getAngle(x, y){
+      const angle = Math.atan2(y,x);
+      return angle;
     }
 
     draw(ctx) {
@@ -97,11 +116,22 @@
 
       if (this.canGrowNewBranch()) {
         this.tree.drain(this.growBranchCost());
-        this.branches.unshift(new Branch(
-          this,
+        const vector = this.getPullVector();
+        const angle = this.getAngle(vector.dx, vector.dy);
+        const oldAngle = getNewAngle(this.angle, this.branches);
+        const angleMix = angle;
+        const branch = new Branch(
+          this, 
           this.tree,
-          getNewAngle(this.angle, this.branches))
-        )
+          angleMix)
+        this.branches.unshift(branch)
+        // Capture targets
+        for(var i = 0;i<this.tree.targets.length;i++){
+          if(this.tree.targets[i].L2_norm(branch.endX(),branch.endY()) <= 625){
+              this.tree.targets.splice(i,1);
+              i--;
+          }
+        }
 
       } else if (this.canGrowNewLeaf()) {
         this.tree.drain(this.growLeafCost());

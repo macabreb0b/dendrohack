@@ -5,9 +5,10 @@
   class Tree {
 
 
-    constructor(width, height) {
+    constructor(width, height, targets) {
       const startX = width / 2;
       const startY = height;
+      this.targets = targets;
       this.energy = 3;
 
       this.startBranch = new Branch(
@@ -21,6 +22,11 @@
 
     draw(ctx) {
       this.startBranch.draw(ctx)
+      this.targets.forEach(target => {
+        ctx.arc(target.x, target.y, 10, 0, Math.PI*2);
+        ctx.stroke();
+      })
+      console.log(this.energy);
     }
 
     grow() {
