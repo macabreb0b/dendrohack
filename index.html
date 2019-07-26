@@ -7,9 +7,17 @@
         height: 100%;
         margin: 0px;
       }
+        button {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background-color: greenyellow;
+            font-size: 22px;
+        }
     </style>
 </head>
 <body>
+    <button id="start-button">Grow!!!!!</button>
     <canvas width="500" height="500"></canvas>
 
     <script src="util.js"></script>
@@ -33,9 +41,7 @@
             app.start()
         }
 
-        restart()
-
-        document.addEventListener('click', restart)
+        document.getElementById('start-button').addEventListener('click', restart)
 
     </script>
 </body>
