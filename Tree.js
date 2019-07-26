@@ -3,8 +3,6 @@
   const Branch = DendroHack.Branch;
 
   class Tree {
-
-
     constructor(width, height, targets) {
       const startX = width / 2;
       const startY = height;
@@ -24,11 +22,15 @@
       this.startBranch.draw(ctx);
       this.startBranch.drawLeaves(ctx);
 
+      // Draw targets
       this.targets.forEach(target => {
+        ctx.strokeStyle = 'rgb(255,0,0)';
+        ctx.beginPath();
         ctx.arc(target.x, target.y, 10, 0, Math.PI*2);
         ctx.stroke();
+        ctx.closePath();
       })
-      console.log(this.energy);
+      //console.log(this.energy);
     }
 
     grow() {
