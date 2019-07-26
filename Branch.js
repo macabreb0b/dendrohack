@@ -4,9 +4,9 @@
   const Constants = DendroHack.Constants;
   const Util = DendroHack.Util;
 
-  const MAX_JANK_ANGLE = Math.PI * 5 / 24;
+  const MAX_JANK_ANGLE = Math.PI / 4;
   function getNewAngle(angle, other) {
-    var correction = 0;
+    let correction = 0;
     other.forEach(branch => {
       if(angle > branch.angle){
         correction++;
@@ -34,7 +34,7 @@
   }
 
   function getAngleMix(angle1, angle2, mix){//angle1*mix + angle2*(1-mix)
-    var a, b, m;
+    let a, b, m;
     if(angle1 > angle2){
       a = angle1;
       b = angle2;
@@ -53,21 +53,17 @@
 
   // Standard Normal variate using Box-Muller transform.
   function randn_bm() {
-    var u = 0, v = 0;
+    let u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
     while(v === 0) v = Math.random();
     return Math.sqrt( -2.0 * Math.log(u) ) * Math.cos( 2.0 * Math.PI * v );
   }
 
   function getBranchColor(branchWidth, trunkWidth) {
-    // const red = 255 - (245 * ((branchWidth) / trunkWidth))
-
-    const black = [10, 20, 10];
-    const brown = [212, 164, 125];
-    const factor =  trunkWidth / (branchWidth * 2);
-    const red = black[0] + (brown[0] - black[0]) * factor;
-    const blue = black[1] + (brown[1] - black[1]) * factor;
-    const green = black[2] + (brown[2] - black[2]) * factor;
+    const factor =  (branchWidth * 2) / trunkWidth;
+    const red = 212 - (192 * factor);
+    const green = 200 - (180 * factor);
+    const blue = 125 - (110 * factor);
 
     return Util.concatRgbString(red, blue, green);
   }

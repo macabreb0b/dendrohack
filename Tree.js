@@ -1,12 +1,27 @@
 (function (root) {
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Branch = DendroHack.Branch;
+  const Node = DendroHack.Node;
+
+  generateRandomTargets = (xDim, yDim, numTargets) => {
+    var targets = [];
+    // Initialize random targets
+    for (var i = 0; i<numTargets; i++) {
+        var radius = Math.random()*200 + 20;
+        var angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
+        const x = Math.cos(angle)*radius + xDim/2;
+        const y = Math.sin(angle)*radius + yDim/3;
+
+        targets.push(new Node(x, y));
+    }
+    return targets
+  }
 
   class Tree {
-    constructor(width, height, targets) {
+    constructor(width, height) {
       const startX = width / 2;
       const startY = height;
-      this.targets = targets;
+      this.targets = generateRandomTargets(width, height, 30);
       this.energy = 3;
 
       this.startBranch = new Branch(
@@ -48,6 +63,9 @@
     trunkWidth() {
       return this.startBranch.width;
     }
+
+
+
   }
 
 
