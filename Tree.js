@@ -7,8 +7,8 @@
     var targets = [];
     // Initialize random targets
     for (var i = 0; i<numTargets; i++) {
-        var radius = Math.random()*200 + 20;
-        var angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
+        var radius = Math.random() * 400 + 10;
+        var angle = Math.random() * 2 * Math.PI // Random angle between 0 & 2Pi (a circle)
         const x = Math.cos(angle)*radius + xDim/2;
         const y = Math.sin(angle)*radius + yDim/3;
 
@@ -33,7 +33,7 @@
         var angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
         const x = Math.cos(angle)*radius + xDim/2;
         const y = Math.sin(angle)*radius + yDim/2-50;
-        
+
         squiggleTargets.push(new Node(x, y));
     }
     return squiggleTargets;
@@ -43,7 +43,7 @@
     constructor(width, height) {
       const startX = width / 2;
       const startY = height;
-      this.targets = generateSquiggleTargets(width, height, 35, 15);
+      this.targets = generateRandomTargets(width, height, 35);
       this.energy = 3;
 
       this.startBranch = new Branch(
