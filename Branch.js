@@ -4,9 +4,9 @@
   const Constants = DendroHack.Constants;
   const Util = DendroHack.Util;
 
-  const MAX_JANK_ANGLE = Math.PI * 5 / 24;
+  const MAX_JANK_ANGLE = Math.PI / 5;
   function getNewAngle(angle, other) {
-    var correction = 0;
+    let correction = 0;
     other.forEach(branch => {
       if(angle > branch.angle){
         correction++;
@@ -18,54 +18,19 @@
     return angle + MAX_JANK_ANGLE * (Math.random()) * (Math.random() < (0.5) ? -1 : 1)
   }
 
-  function constrainAngle(angle){
-    while(angle<0){
-      angle+=Math.PI*2;
-    }
-    while(angle>2*Math.PI){
-      angle-=Math.PI*2
-    }
-    return angle;
-  }
-
-  function getAngle(x, y){
-    const angle = Math.atan2(y,x);
-    return angle;
-  }
-
-  function getAngleMix(angle1, angle2, mix){//angle1*mix + angle2*(1-mix)
-    var a, b, m;
-    if(angle1 > angle2){
-      a = angle1;
-      b = angle2;
-      m = mix
-    }
-    else{
-      a = angle2;
-      b = angle1;
-      m = 1-mix;
-    }
-    if(a-b > Math.PI){
-      b += 2*Math.PI;
-    }
-    return constrainAngle(a*m+b*(1-m));
-  }
-
   // Standard Normal variate using Box-Muller transform.
   function randn_bm() {
-    var u = 0, v = 0;
+    let u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
     while(v === 0) v = Math.random();
     return Math.sqrt( -2.0 * Math.log(u) ) * Math.cos( 2.0 * Math.PI * v );
   }
 
   function getBranchColor(branchWidth, trunkWidth) {
-    const black = [0, 0, 0];
-    const brown = [222, 184, 135];
-    const factor = 1 - (branchWidth * 2) / trunkWidth;
-    const red = black[0] + (brown[0] - black[0]) * factor;
-    const blue = black[1] + (brown[1] - black[1]) * factor;
-    const green = black[2] + (brown[2] - black[2]) * factor;
+    const factor =  (branchWidth * 2) / trunkWidth;
+    const red = 212 - (192 * factor);
+    const green = 200 - (180 * factor);
+    const blue = 125 - (110 * factor);
 
     return Util.concatRgbString(red, blue, green);
   }
@@ -89,11 +54,11 @@
     }
 
     endX() {
-      return this.startX() + Math.cos(this.angle) * 8 * Math.sqrt(this.length); // Note: actual length of branch is not the same as this.length uhhh woops.
+      return this.startX() + Math.cos(this.angle) * this.length; // Note: actual length of branch is not the same as this.length uhhh woops.
     }
 
     endY() {
-      return this.startY() + Math.sin(this.angle) * 8 * Math.sqrt(this.length);
+      return this.startY() + Math.sin(this.angle) * this.length;
     }
 
     startX() {
@@ -141,12 +106,20 @@
       ctx.stroke();
 
       this.branches.forEach(branch => branch.draw(ctx));
-      this.leaves.forEach(leaf => leaf.draw(ctx));
     }
 
-    grow() {
-      if (Math.random() < .5) Util.shuffle(this.branches);
-      this.branches.forEach(branch => branch.grow());
+    drawLeaves(ctx) {
+      this.leaves.forEach(leaf => leaf.draw(ctx));
+      this.branches.forEach(branch => branch.drawLeaves(ctx));
+    }
+
+    grow() {  
+      var indices = []
+      for(var i =0;i<this.branches.length;i++){
+        indices.push(i);
+      }
+      Util.shuffle(indices);
+      indices.forEach(index => this.branches[index].grow());
 
       this.leaves.forEach(leaf => leaf.grow());
       this.prune();
@@ -154,12 +127,12 @@
       if (this.canGrowNewBranch()) {
         this.tree.drain(this.growBranchCost());
         const vector = this.getPullVector();
-        const targetedAngle = constrainAngle(getAngle(vector.dx, vector.dy));
-        const randomAngle = constrainAngle(getNewAngle(this.angle, this.branches));
-        const angleMix = getAngleMix(targetedAngle, randomAngle, .15);
+        const targetedAngle = Util.constrainAngle(Util.getAngle(vector.dx, vector.dy));
+        const randomAngle = Util.constrainAngle(getNewAngle(this.angle, this.branches));
+        const angleMix = Util.getAngleMix(targetedAngle, randomAngle, .15);
         console.log(targetedAngle +" "+randomAngle+" "+angleMix);
         const branch = new Branch(
-          this, 
+          this,
           this.tree,
           angleMix)
         this.branches.unshift(branch)
