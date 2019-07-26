@@ -72,6 +72,10 @@
 
     getPullVector() {
       const targets = this.getInfluencingTargets();
+      if (targets.length === 0) {
+        // This branch is not close enough to any targets to be influenced by them
+        return null;
+      }
       const vector = {dx:0, dy:0}
       targets.forEach(target => {
           const ex = this.endX();
@@ -87,7 +91,11 @@
         const influencingTargets = [];
         for (let target of this.tree.targets){
             if(target.closestBranch === this){
+                console.log(target.closestBranch, this)
                 influencingTargets.push(target);
+            } else {
+                // debugger
+
             }
         }
         return influencingTargets;
@@ -165,6 +173,7 @@
               i--;
           } else if (dist < target.closestDist){
               // Update the closest target and associated distance in the array.
+              debugger
               target.closestDist = dist;
               target.closestBranch = this;
           }

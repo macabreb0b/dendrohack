@@ -2,12 +2,12 @@
     const DendroHack = root.DendroHack = (root.DendroHack || {});
     // Node is a point in space to guide growth.
     class Node{ 
-        constructor(x, y){
+        constructor(x, y, closestBranch){
             this.x = x;
             this.y = y;
             this.captureRadius = 625;
             this.closestDist = Number.MAX_VALUE;
-            this.closestBranch = null;
+            this.closestBranch = closestBranch;
         }
 
         /**
