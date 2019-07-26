@@ -2,6 +2,7 @@
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Leaf = DendroHack.Leaf;
   const Constants = DendroHack.Constants;
+  const Util = DendroHack.Util;
 
   const MAX_JANK_ANGLE = Math.PI / 8;
   function getNewAngle(angle, other) {
@@ -69,10 +70,10 @@
       const black = [0, 0, 0];
       const brown = [222, 184, 135];
       const factor = 1 - (this.width * 2) / this.tree.trunkWidth();
-      const color = [black[0] + (brown[0] - black[0]) * factor,
-                     black[1] + (brown[1] - black[1]) * factor,
-                     black[2] + (brown[2] - black[2]) * factor]
-      ctx.strokeStyle = 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+      const red = black[0] + (brown[0] - black[0]) * factor
+      const blue = black[1] + (brown[1] - black[1]) * factor
+      const green = black[2] + (brown[2] - black[2]) * factor
+      ctx.strokeStyle = Util.concatRgbString(red, blue, green);
 
       ctx.lineWidth = 2 * Math.log(this.width);
 

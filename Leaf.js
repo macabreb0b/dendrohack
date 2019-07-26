@@ -1,8 +1,9 @@
 (function (root) {
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Constants = DendroHack.Constants;
-  class Leaf {
+  const Util = DendroHack.Util;
 
+  class Leaf {
     constructor(parentBranch, tree, angle) {
       this.age = 0;
 
@@ -36,7 +37,7 @@
     }
 
     draw(ctx) {
-      const leafColor = 'rgb(' + 50  + ',' + (100 + (105 - this.age * (105 / Constants.MAX_LEAF_AGE))) + ',' + 50 + ')';
+      const leafColor = Util.concatRgbString(50, (100 + (105 - this.age * (105 / Constants.MAX_LEAF_AGE))), 50);
       ctx.strokeStyle = leafColor;
       ctx.fillStyle = leafColor;
       ctx.lineWidth = this.width;
