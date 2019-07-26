@@ -12,7 +12,7 @@
         const x = Math.cos(angle)*radius + xDim/2;
         const y = Math.sin(angle)*radius + yDim/3;
 
-        targets.push(new Node(x, y, this.startBranch));
+        targets.push(new Node(x, y));
     }
     return targets
   }
@@ -42,6 +42,9 @@
     constructor(width, height, userGeneratedTargets) {
       const startX = width / 2;
       const startY = height;
+      this.targets = generateRandomTargets(width, height, 35);
+      this.energy = 3;
+
       this.startBranch = new Branch(
         null /** no parent branch for the first branch */,
         this, /** reference to Tree */
@@ -78,7 +81,7 @@
       })
       //console.log(this.energy);
     }
-    
+
     grow() {
       this.startBranch.grow();
     }

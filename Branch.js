@@ -46,7 +46,7 @@
       this._startY = startY
 
       this.setLevel() /** set level before setting length */
-      this.length = (.9 ** this.level) * Constants.NEW_BRANCH_LENGTH;
+      this.length = (.95 ** this.level) * Constants.NEW_BRANCH_LENGTH;
       this.width = Constants.NEW_BRANCH_WIDTH; // this also represents "capacity"
 
       this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle, []))];
@@ -234,7 +234,11 @@
     }
 
     canGrowSize() {
-      return this.tree.energy > this.growSizeCost() && (this.parentBranch ? this.parentBranch.capacity() > 0 : true);
+      return (
+        this.tree.targets.length > 0 &&
+        this.tree.energy > this.growSizeCost() &&
+        (this.parentBranch ? this.parentBranch.capacity() > 0 : true)
+      );
     }
 
     growSizeCost() {
