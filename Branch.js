@@ -18,16 +18,12 @@
     return angle + MAX_JANK_ANGLE * (randn_bm() * .2 + 1) * (Math.random() < (0.5 - .2 * correction) ? -1 : 1)
   }
 
-  function shuffle(array) {
-    array.sort(() => Math.random() - 0.5);
-  }
-
   // Standard Normal variate using Box-Muller transform.
   function randn_bm() {
     var u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
     while(v === 0) v = Math.random();
-    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+    return Math.sqrt( -2.0 * Math.log(u) ) * Math.cos( 2.0 * Math.PI * v );
   }
 
   function getBranchColor(branchWidth, trunkWidth) {
@@ -93,7 +89,7 @@
     }
 
     grow() {
-      if(Math.random()<.5) shuffle(this.branches);
+      if (Math.random() < .5) Util.shuffle(this.branches);
       this.branches.forEach(branch => branch.grow());
 
       this.leaves.forEach(leaf => leaf.grow());
