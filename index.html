@@ -2,17 +2,38 @@
 <head>
     <title>DendroHack</title>
     <style>
-      html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-      }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+        }
+        #startButton {
+            position: absolute;
+            width: 80px;
+            height: 50px;
+            background-color: greenyellow;
+            font-size: 20px;
+            top: 25px;
+            right: 25px;
+        }
+        #clearButton {
+            position: absolute;
+            width: 80px;
+            height: 50px;
+            font-size: 20px;
+            top: 25px;
+            right: 120px;
+        }
     </style>
 </head>
 <body>
+    <button id="clearButton">Clear</button>
+    <button id="startButton">Grow</button>
     <canvas width="500" height="500"></canvas>
 
+    <script src="util.js"></script>
     <script src="constants.js"></script>
+    <script src="Node.js"></script>
     <script src="Leaf.js"></script>
     <script src="Branch.js"></script>
     <script src="Tree.js"></script>
@@ -22,18 +43,65 @@
     <script>
         var canvas = document.getElementsByTagName("canvas")[0];
         var width = canvas.width = window.innerWidth
-        var height = canvas.height = window.innerHeight
+        var height = canvas.height = window.innerHeight + 50; // add button height
+
+        window.userGeneratedTargets = [];
+        let sprayInterval = null;
+        let translatedMouseX = 0;
+        let translatedMouseY = 0;
+        document.addEventListener('mousemove', () => {
+            translatedMouseX = event.clientX;
+            translatedMouseY = event.clientY;
+        });
+        document.addEventListener("mousedown", () => {
+            window.sprayInterval = setInterval(() => {
+                const radius = Math.random()*100;
+                const angle = Math.random()*2*Math.PI // Random angle between 0 & 2Pi (a circle)
+                let x = translatedMouseX
+                let y = translatedMouseY
+                window.userGeneratedTargets.push({x, y});
+                let ctx = canvas.getContext("2d");
+                ctx.strokeStyle = 'rgb(255,0,0)';
+                ctx.beginPath();
+                ctx.arc(
+                  x,
+                  y,
+                  10,
+                  0,
+                  Math.PI*2,
+                );
+                ctx.stroke();
+                ctx.closePath();
+            }, 100)
+        });
+
+        document.addEventListener("mouseup", () => {
+            window.clearInterval(window.sprayInterval);
+        });
 
         let app;
         const restart = () => {
             if (app) app.stop();
-            app = new DendroHack.App(width, height, canvas);
+            app = new DendroHack.App(width, height, canvas, window.userGeneratedTargets);
             app.start()
         }
 
-        restart()
+        document.getElementById('startButton').addEventListener('click', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
 
-        document.addEventListener('click', restart)
+            clearInterval(window.sprayInterval)
+            restart()
+        })
+
+        document.getElementById('clearButton').addEventListener('click', (event) => {
+            event.preventDefault()
+            if (app) app.stop();
+            clearInterval(window.sprayInterval)
+            window.userGeneratedTargets = []
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        })
 
     </script>
 </body>

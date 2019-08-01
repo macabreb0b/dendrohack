@@ -2,10 +2,37 @@
   const DendroHack = root.DendroHack = (root.DendroHack || {});
   const Leaf = DendroHack.Leaf;
   const Constants = DendroHack.Constants;
+  const Util = DendroHack.Util;
 
-  const MAX_JANK_ANGLE = 1
-  function getNewAngle(angle) {
-    return angle + MAX_JANK_ANGLE * Math.random() * (Math.random() < 0.5 ? -1 : 1)
+  const MAX_JANK_ANGLE = Math.PI / 5;
+  function getNewAngle(angle, other) {
+    let correction = 0;
+    other.forEach(branch => {
+      if(angle > branch.angle){
+        correction++;
+      }
+      else {
+        correction--;
+      }
+    })
+    return angle + MAX_JANK_ANGLE * (Math.random()) * (Math.random() < (0.5) ? -1 : 1)
+  }
+
+  // Standard Normal variate using Box-Muller transform.
+  function randn_bm() {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    return Math.sqrt( -2.0 * Math.log(u) ) * Math.cos( 2.0 * Math.PI * v );
+  }
+
+  function getBranchColor(branchWidth, trunkWidth) {
+    const factor =  (branchWidth * 2) / trunkWidth;
+    const red = 250 - (242 * factor);
+    const green = 210 - (180 * factor);
+    const blue = 100 - (90 * factor);
+
+    return Util.concatRgbString(red, green, blue);
   }
 
   class Branch {
@@ -18,16 +45,27 @@
       this._startX = startX
       this._startY = startY
 
-      this.length = Constants.NEW_BRANCH_LENGTH;
+      this.setLevel() /** set level before setting length */
+      this.length = (.95 ** this.level) * Constants.NEW_BRANCH_LENGTH;
       this.width = Constants.NEW_BRANCH_WIDTH; // this also represents "capacity"
 
-      this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle))];
+      this.leaves = [new Leaf(this, this.tree, getNewAngle(this.angle, []))];
       // this.leaves = [];
       this.branches = [];
     }
 
+    setLevel() {
+      let level = 0;
+      let currentBranch = this;
+      while (currentBranch) {
+        level += 1;
+        currentBranch = currentBranch.parentBranch;
+      }
+      this.level = level;
+    }
+
     endX() {
-      return this.startX() + Math.cos(this.angle) * this.length;
+      return this.startX() + Math.cos(this.angle) * this.length; // Note: actual length of branch is not the same as this.length uhhh woops.
     }
 
     endY() {
@@ -43,11 +81,38 @@
       return this._startY === undefined ? this.parentBranch.endY() : this._startY;
     }
 
+    getPullVector() {
+      const targets = this.getInfluencingTargets();
+      if (targets.length === 0) {
+        // This branch is not close enough to any targets to be influenced by them
+        return null;
+      }
+      const vector = {dx:0, dy:0}
+      targets.forEach(target => {
+          const ex = this.endX();
+          const ey = this.endY();
+          const dist = target.L2_norm(ex, ey);
+          vector.dx += (target.x - ex)/dist
+          vector.dy += (target.y - ey)/dist
+      });
+      return vector;
+    }
+
+    getInfluencingTargets(){
+        const influencingTargets = [];
+        for (let target of this.tree.targets){
+            if(target.closestBranch === this){
+                influencingTargets.push(target);
+            }
+        }
+        return influencingTargets;
+    }
+
     draw(ctx) {
       /** use width to compute rgb value; higher width => lower number (darker shade) */
-      ctx.strokeStyle = 'rgb(' + (255 - (245 * ((this.width * 2) / this.tree.trunkWidth()))) + ',0,0)';
-      // ctx.lineWidth = this.width / (Math.PI * 2);
-      ctx.lineWidth = Math.sqrt(this.width);
+      ctx.strokeStyle = getBranchColor(this.width, this.tree.trunkWidth());
+
+      ctx.lineWidth = 2 * Math.log(this.width);
 
       ctx.beginPath();
       ctx.moveTo(this.startX(), this.startY());
@@ -56,27 +121,74 @@
       ctx.stroke();
 
       this.branches.forEach(branch => branch.draw(ctx));
+    }
+
+    drawLeaves(ctx) {
       this.leaves.forEach(leaf => leaf.draw(ctx));
+      this.branches.forEach(branch => branch.drawLeaves(ctx));
     }
 
     grow() {
-      this.branches.forEach(branch => branch.grow());
+      var indices = []
+      for(var i =0;i<this.branches.length;i++){
+        indices.push(i);
+      }
+      Util.shuffle(indices);
+      indices.forEach(index => this.branches[index].grow());
 
       this.leaves.forEach(leaf => leaf.grow());
       this.prune();
 
       if (this.canGrowNewBranch()) {
-        this.branches.unshift(new Branch(this, this.tree, getNewAngle(this.angle)))
-        this.tree.drain(this.growBranchCost())
+        this.tree.drain(this.growBranchCost());
+        const vector = this.getPullVector();
+        const randomAngle = Util.constrainAngle(getNewAngle(this.angle, this.branches));
+        let angleMix = randomAngle;
+        if (vector) {
+          // Only mix the angles if there are targets that influence the angle of this branch
+          const targetedAngle = Util.constrainAngle(Util.getAngle(vector.dx, vector.dy));
+          angleMix = Util.getAngleMix(targetedAngle, randomAngle, Constants.TARGETED_ANGLE_WEIGHT);
+          console.log(targetedAngle +" "+randomAngle+" "+angleMix);
+        }
+        const branch = new Branch(
+          this,
+          this.tree,
+          angleMix,
+        )
+        this.branches.unshift(branch)
+        this.captureTargetsAndUpdateTargetDistances();
+
       } else if (this.canGrowNewLeaf()) {
-        this.leaves.push(new Leaf(this, this.tree, getNewAngle(this.angle)))
-        this.tree.drain(this.growLeafCost())
+        this.tree.drain(this.growLeafCost());
+        this.leaves.push(new Leaf(
+          this,
+          this.tree,
+          getNewAngle(this.angle, []))
+        )
+
       } else if (this.canGrowSize()) {
         this.tree.drain(this.growSizeCost());
 
         this.width += Constants.BRANCH_WIDTH_INCREMENT; /** TODO randomize this number to get more branches sometimes? */
         this.length += Constants.BRANCH_LENGTH_INCREMENT;
       }
+    }
+
+    captureTargetsAndUpdateTargetDistances() {
+        // Capture targets and update distances
+        for(var i = 0;i<this.tree.targets.length;i++){
+          const target = this.tree.targets[i];
+          const dist = target.L2_norm(this.endX(),this.endY());
+
+          if(dist <= target.captureRadius){
+              this.tree.targets.splice(i,1);
+              i--;
+          } else if (dist < target.closestDist){
+              // Update the closest target and associated distance in the array.
+              target.closestDist = dist;
+              target.closestBranch = this;
+          }
+        }
     }
 
     prune() {
@@ -96,6 +208,7 @@
 
     canGrowNewBranch() {
       return (
+        this.tree.targets.length > 0 &&
         this.width > Constants.NEW_BRANCH_WIDTH &&
         this.capacity() >= Constants.NEW_BRANCH_WIDTH &&
         this.branches.length < Constants.BRANCH_LIMIT &&
@@ -121,7 +234,11 @@
     }
 
     canGrowSize() {
-      return this.tree.energy > this.growSizeCost() && (this.parentBranch ? this.parentBranch.capacity() > 0 : true);
+      return (
+        this.tree.targets.length > 0 &&
+        this.tree.energy > this.growSizeCost() &&
+        (this.parentBranch ? this.parentBranch.capacity() > 0 : true)
+      );
     }
 
     growSizeCost() {

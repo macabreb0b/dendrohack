@@ -4,11 +4,11 @@
   const Environment = DendroHack.Environment;
 
   class App {
-    constructor(xDim, yDim, canvasEl) {
+    constructor(xDim, yDim, canvasEl, userGeneratedTargets) {
       this.canvas = canvasEl.getContext("2d");
       this.xDim = xDim;
       this.yDim = yDim;
-
+      this.userGeneratedTargets = userGeneratedTargets;
     }
 
     draw(ctx) {
@@ -26,11 +26,11 @@
       const sim = this;
 
       this.environment = new Environment(this.xDim, this.yDim);
-      this.tree = new Tree(this.xDim, this.yDim);
+      this.tree = new Tree(this.xDim, this.yDim, this.userGeneratedTargets);
 
       this.intervalId = setInterval(function() {
         sim.step(ctx);
-      }, 1);
+      }, 10);
     }
 
     stop() {
