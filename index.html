@@ -74,11 +74,11 @@
                 ctx.closePath();
             }, 100)
         });
-    
+
         document.addEventListener("mouseup", () => {
             window.clearInterval(window.sprayInterval);
         });
-        
+
         let app;
         const restart = () => {
             if (app) app.stop();
@@ -87,7 +87,9 @@
         }
 
         document.getElementById('startButton').addEventListener('click', (event) => {
-            event.preventDefault()
+            event.stopPropagation();
+            event.preventDefault();
+
             clearInterval(window.sprayInterval)
             restart()
         })
